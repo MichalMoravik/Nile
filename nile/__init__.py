@@ -34,4 +34,4 @@ except Exception as e:
     
 ############# END #############
 # by importing routes after the app is initialized, circular import error are avoided
-from nile.routes import customers, telephones, orders
+from nile.routes import customers, telephones, orders, products

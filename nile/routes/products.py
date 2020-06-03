@@ -3,38 +3,38 @@ from nile import mongoDB, app
 import json
 from bson.objectid import ObjectId  
 
-############# Orders #############
+############# Products #############
 # POST
-@app.route("/order", methods=["POST"])
-def create_order():
+@app.route("/product", methods=["POST"])
+def create_product():
     try:
         body = request.get_json()
 
-        order = {
-            "deliveryAddress": body["deliveryAddress"],
-            "deliveryPrice": body["deliveryPrice"],
-            "products": body["products"]
+        product = {
+            "name": body["name"],
+            "description": body["description"],
+            "price": body["price"]
         }
 
-        order_response = mongoDB.orders.insert_one(order)
+        product_response = mongoDB.products.insert_one(product)
 
         return Response(
             response=json.dumps(  
                 {
-                    "message": "order created",
-                    "id": f"{order_response.inserted_id}"
+                    "message": "product created",
+                    "id": f"{product_response.inserted_id}"
                 }
             ),
             status=200,
             mimetype="application/json"
         )
     except Exception as ex:
-        print("******* Error in routes/orders.py: create_order() *******")
+        print("******* Error in routes/products.py: create_product() *******")
         print(ex)
         return Response(
             response=json.dumps(  
                 {
-                    "message": "Couldn't create a new order",
+                    "message": "Couldn't create a new product",
                 }
             ),
             status=500,
@@ -43,13 +43,13 @@ def create_order():
 
 
 # GET ALL
-@app.route("/order", methods=["GET"])
-def get_orders():
+@app.route("/product", methods=["GET"])
+def get_products():
     try:
-        data = list(mongoDB.orders.find())
+        data = list(mongoDB.products.find())
 
-        for order in data:
-            order["_id"] = str(order["_id"])
+        for product in data:
+            product["_id"] = str(product["_id"])
 
         return Response(
             response=json.dumps(data),
@@ -57,12 +57,12 @@ def get_orders():
             mimetype="application/json"  
         )
     except Exception as ex:
-        print("******* Error in routes/orders.py: get_orders() *******")
+        print("******* Error in routes/products.py: get_products() *******")
         print(ex)
         return Response(
             response=json.dumps(  
                 {
-                    "message": "Couldn't get orders",
+                    "message": "Couldn't get products",
                 }
             ),
             status=500,
@@ -70,24 +70,24 @@ def get_orders():
         )
 
 # GET ONE
-@app.route("/order/<id>", methods=["GET"])
-def get_order(id):
+@app.route("/product/<id>", methods=["GET"])
+def get_product(id):
     try:
-        order = mongoDB.orders.find_one({"_id": ObjectId(id)})
-        order["_id"] = str(order["_id"])
+        product = mongoDB.products.find_one({"_id": ObjectId(id)})
+        product["_id"] = str(product["_id"])
 
         return Response(
-            response=json.dumps(order),
+            response=json.dumps(product),
             status=200,
             mimetype="application/json"  
         )
     except Exception as ex:
-        print("******* Error in routes/orders.py: get_order(id) *******")
+        print("******* Error in routes/products.py: get_product(id) *******")
         print(ex)
         return Response(
             response=json.dumps(  
                 {
-                    "message": f"Couldn't get order. Id: {id}",
+                    "message": f"Couldn't get product. Id: {id}",
                 }
             ),
             status=500,
@@ -95,27 +95,27 @@ def get_order(id):
         )
 
 # UPDATE ONE
-@app.route("/order/<id>", methods=["PATCH"])
-def update_order(id):
+@app.route("/product/<id>", methods=["PATCH"])
+def update_product(id):
     try:
         body = request.get_json()
 
         data = {
-            "deliveryAddress": body["deliveryAddress"],
-            "deliveryPrice": body["deliveryPrice"],
-            "products": body["products"]
+            "name": body["name"],
+            "description": body["description"],
+            "price": body["price"]
         }
 
-        order = mongoDB.orders.update_one(
+        product = mongoDB.products.update_one(
             {"_id": ObjectId(id)},
             {"$set": data}
         )
 
-        if order.modified_count == 1:
+        if product.modified_count == 1:
             return Response(
                 response=json.dumps(  
                     {
-                        "message": f"order updated. Id: {id}",
+                        "message": f"product updated. Id: {id}",
                     }
                 ),
                 status=200,
@@ -131,12 +131,12 @@ def update_order(id):
             mimetype="application/json"  
         )
     except Exception as ex:
-        print("******* Error in routes/orders.py: update_order(id) *******")
+        print("******* Error in routes/products.py: update_product(id) *******")
         print(ex)
         return Response(
             response=json.dumps(  
                 {
-                    "message": "Couldn't update order",
+                    "message": "Couldn't update product",
                 }
             ),
             status=500,
@@ -144,16 +144,16 @@ def update_order(id):
         )
 
 # DELETE
-@app.route("/order/<id>", methods=["DELETE"])
-def delete_order(id):  
+@app.route("/product/<id>", methods=["DELETE"])
+def delete_product(id):  
     try:
-        order = mongoDB.orders.delete_one({"_id": ObjectId(id)})
+        product = mongoDB.products.delete_one({"_id": ObjectId(id)})
 
-        if order.deleted_count == 1:
+        if product.deleted_count == 1:
             return Response(
                 response=json.dumps(  
                     {
-                        "message": f"order deleted. Id: {id}"
+                        "message": f"product deleted. Id: {id}"
                     }
                 ),
                 status=200,
@@ -163,7 +163,7 @@ def delete_order(id):
         return Response(
             response=json.dumps(  
                 {
-                    "message": f"order not found. Id: {id}"
+                    "message": f"product not found. Id: {id}"
                 }
             ),
             status=200,
@@ -175,7 +175,7 @@ def delete_order(id):
         return Response(
             response=json.dumps(  
                 {
-                    "message": "Couldn't delete order",
+                    "message": "Couldn't delete product",
                 }
             ),
             status=500,
