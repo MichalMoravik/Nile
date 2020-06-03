@@ -2,13 +2,17 @@ from flask import Response, request
 from nile import mongoDB, app
 import json
 
+############# Orders #############
 # POST
 @app.route("/order", methods=["POST"])
 def create_order():
     try:
+        body = request.get_json()
+
         order = {
-            "name": "testiiik",
-            # "lastname": request.form["lastName"]
+            "deliveryAddress": body["deliveryAddress"],
+            "deliveryPrice": body["deliveryPrice"],
+            "products": body["products"]
         }
 
         dbResponse = mongoDB.orders.insert_one(order)
