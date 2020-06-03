@@ -87,7 +87,95 @@ def get_order(id):
         return Response(
             response=json.dumps(  
                 {
-                    "message": "Couldn't get order",
+                    "message": f"Couldn't get order. Id: {id}",
+                }
+            ),
+            status=500,
+            mimetype="application/json"  
+        )
+
+# UPDATE ONE
+@app.route("/order/<id>", methods=["PATCH"])
+def update_order(id):
+    try:
+        body = request.get_json()
+
+        data = {
+            "deliveryAddress": body["deliveryAddress"],
+            "deliveryPrice": body["deliveryPrice"],
+            "products": body["products"]
+        }
+
+        order = mongoDB.orders.update_one(
+            {"_id": ObjectId(id)},
+            {"$set": data}
+        )
+
+        if order.modified_count == 1:
+            return Response(
+                response=json.dumps(  
+                    {
+                        "message": f"order updated. Id: {id}",
+                    }
+                ),
+                status=200,
+                mimetype="application/json"  
+            )
+        return Response(
+            response=json.dumps(  
+                {
+                    "message": f"nothing to update. Id: {id}",
+                }
+            ),
+            status=200,
+            mimetype="application/json"  
+        )
+    except Exception as ex:
+        print("******* Error in routes/orders.py: update_order(id) *******")
+        print(ex)
+        return Response(
+            response=json.dumps(  
+                {
+                    "message": "Couldn't update order",
+                }
+            ),
+            status=500,
+            mimetype="application/json"  
+        )
+
+# DELETE
+@app.route("/order/<id>", methods=["DELETE"])
+def delete_order(id):  
+    try:
+        order = mongoDB.orders.delete_one({"_id": ObjectId(id)})
+
+        if order.deleted_count == 1:
+            return Response(
+                response=json.dumps(  
+                    {
+                        "message": f"order deleted. Id: {id}"
+                    }
+                ),
+                status=200,
+                mimetype="application/json"  
+            )
+
+        return Response(
+            response=json.dumps(  
+                {
+                    "message": f"order not found. Id: {id}"
+                }
+            ),
+            status=200,
+            mimetype="application/json" 
+        )
+
+    except Exception as ex:
+        print(ex)
+        return Response(
+            response=json.dumps(  
+                {
+                    "message": "Couldn't delete order",
                 }
             ),
             status=500,
