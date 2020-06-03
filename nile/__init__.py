@@ -7,12 +7,14 @@ app = Flask(__name__)
 
 ############# MongoDB DATABASE SETUP #############
 try: 
+    # mongo_uri = "mongodb://localhost:27017/nile"
+    # mongoDB = pymongo.MongoClient(mongo_uri)
     mongo = pymongo.MongoClient(
         host="localhost",
         port=27017,  # default mongoDB port 
         serverSelectionTimeoutMS=1000  
     )
-    db_mongo = mongo.nile 
+    mongoDB = mongo.nile
     mongo.server_info()  # triggers exception if cannot connect to DB
 except:
     print(f"******* Error in __init__.py: Cannot establish MongoDB connection *******")
@@ -32,4 +34,4 @@ except Exception as e:
     
 ############# END #############
 # by importing routes after the app is initialized, circular import error are avoided
-from nile.routes import customers, telephones
+from nile.routes import customers, telephones, orders
